@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import Search from './components/Search'
 import Results from './components/Results'
+import Popup from './components/Popup'
 
 function App() {
   const apiurl = "http://www.omdbapi.com/?apikey=48b224f3";
@@ -34,6 +35,23 @@ function App() {
     console.log(state.s);
   }
 
+  const openPopup = (id) => {
+    console.log("openPopup");
+    axios(apiurl + "&i=" + id).then(( {data} ) => {
+      let result = data;
+      console.log("openpopup with " + result);
+      setState(prevState => {
+        return { ...prevState, selected: result }
+      });
+    });
+  }
+
+  const closePopup = () => {
+    setState(prevState => {
+      return {...prevState, selected: {}};
+    });
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -44,7 +62,9 @@ function App() {
           handleInput={handleInput}
           search={search}        
         />
-        <Results results={state.results} />
+        <Results results={state.results} openPopup={openPopup}/>
+        {(typeof state.selected.Title != "undefined") ?
+        <Popup selected={state.selected} closePopup={closePopup} /> : false}
       </main>
     </div>
   );
